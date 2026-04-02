@@ -37,11 +37,18 @@ dependencies:
   intl: ^0.20.2
   supabase_flutter: 2.12.0
   shared_preferences: ^2.3.0     # ← Add this line
+  pdf: ^3.10.7
+  printing: ^5.12.0
+  path_provider: ^2.1.2
+  flutter_svg: ^2.0.7
+  share_plus: ^10.1.0
+  month_year_picker: ^0.5.0+1
+
 
 dev_dependencies:
  flutter_test:
    sdk: flutter
-
+ flutter_launcher_icons: ^0.13.1
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -61,8 +68,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/logos/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -90,3 +97,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/logos/milkdy_logo.png" # Path to your logo
+  adaptive_icon_background: "#FFFFFF" # A clean white background for Android
+  adaptive_icon_foreground: "assets/logos/milkdy_logo.png"

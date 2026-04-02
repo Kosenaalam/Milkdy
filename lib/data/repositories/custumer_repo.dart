@@ -7,8 +7,11 @@ class CustomerRepo {
    final _supabase = Supabase.instance.client;
 
    Future<CustumerModel> addCustumer(AddCustomerModel customer) async {
-   final userId = supabase.auth.currentUser?.id;
+final userId = supabase.auth.currentUser?.id;
 
+if (userId == null) {
+  throw Exception("User not logged in");
+}
    final response = await _supabase
     .from('customers')
     .insert(
@@ -20,6 +23,9 @@ class CustomerRepo {
    }
    Future <List<CustumerModel>> fetchCustomer() async{
     final userId = _supabase.auth.currentUser?.id;
+    if (userId == null) {
+  throw Exception("User not logged in");
+}
     
     final response = 
      await _supabase
@@ -35,6 +41,9 @@ class CustomerRepo {
 
    Future<void> deleteCustomer( String customerId) async{
     final userId = _supabase.auth.currentUser?.id;
+    if (userId == null) {
+  throw Exception("User not logged in");
+}
    final response = await _supabase
      .from('customers')
      .delete()

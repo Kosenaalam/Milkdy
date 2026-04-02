@@ -18,7 +18,7 @@ class MilkCardItems extends StatelessWidget{
     onLongPress: onDelete,
      child: Card(
              child: Padding(
-                   padding: const EdgeInsets.all(12),
+                   padding: const EdgeInsets.all(8),
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -29,6 +29,7 @@ class MilkCardItems extends StatelessWidget{
                           Text("₹${item.amount}"),
                           Text("₹${item.recived}"),
                           Text("₹${item.paid}"),
+                          Text("${item.feed}"),
                           Text(
                                "₹${item.balance}",
                                 style: const TextStyle(fontWeight: FontWeight.bold),

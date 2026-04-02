@@ -24,6 +24,7 @@ class SellCardListState extends State<SellCardList> {
     super.initState();
     _loadCustomers();
     _searchControllar.addListener(_filterdCustomers);
+    debugPrint('initState called');
   }
   @override
   void dispose() {

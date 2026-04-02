@@ -23,14 +23,22 @@ class _SellCardItemsState extends State<SellCardItems> {
       context: context, 
       useSafeArea: true,
       isScrollControlled: true,
-    builder: (ctx) => NewMilkEntryCard(customerId:  widget.customer.id,),
+    builder: (ctx) => Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom),
+         child: NewMilkEntryCard(customerId: widget.customer.id,),
+         ),
     );
+    // NewMilkEntryCard(customerId:  widget.customer.id,),
+    // );
    }
    void _openDashboard(){
       Navigator.push(context,
      MaterialPageRoute(
       builder: (ctx) =>
-       RangeDashboardScreen(customerId: widget.customer.id ),
+       RangeDashboardScreen(customerId: widget.customer.id,
+        customerName: widget.customer.name,
+        ),
         ),
       );
    }
@@ -38,36 +46,39 @@ class _SellCardItemsState extends State<SellCardItems> {
   @override
  @override
 Widget build(BuildContext context) {
-  return Card(
-    color: const Color.fromARGB(255, 7, 255, 61),
-    elevation: 4,
-    margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
-    child: ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-      leading: IconButton(
-        icon: const Icon(Icons.delete, color: Colors.red, size: 22),
-        onPressed: widget.onDelete,
-      ),
-      title: Text(
-        widget.customer.name,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-      ),
-      subtitle: Text(
-        widget.customer.phone,
-        style: const TextStyle(fontSize: 14),
-      ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
+  return SafeArea(
+    child: Card(
+      
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
+      child: ListTile(
+        dense: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+        leading: IconButton(
+          icon: const Icon(Icons.delete, ),
+          onPressed: widget.onDelete,
+        ),
+        title: Text(
+          widget.customer.name,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        subtitle: Text(
+          widget.customer.phone,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+              IconButton(
+              icon: const Icon(Icons.visibility,  size: 26),
+              onPressed: _openDashboard,
+            ),
             IconButton(
-            icon: const Icon(Icons.visibility, color: Colors.black87, size: 26),
-            onPressed: _openDashboard,
-          ),
-          IconButton(
-            icon: const Icon(Icons.add, color: Colors.blue, size: 26),
-            onPressed: _milkEntryOverlay,
-          ),
-        ],
+              icon: const Icon(Icons.add, color: Colors.blue, size: 26),
+              onPressed: _milkEntryOverlay,
+            ),
+          ],
+        ),
       ),
     ),
   );

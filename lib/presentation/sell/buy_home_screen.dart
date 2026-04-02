@@ -5,6 +5,8 @@ import 'package:milkdy/data/repositories/initialise.dart';
 import 'package:milkdy/presentation/sell/user_profle_screen.dart';
 import 'package:milkdy/presentation/widgets/new_card.dart';
 import 'package:milkdy/presentation/widgets/sell_card_list.dart';
+import 'package:flutter_svg/flutter_svg.dart'; // 1. Add the import here!
+
 
 
 class BuyHomeScreen extends StatefulWidget{
@@ -33,6 +35,9 @@ class _HomeScreenDistState extends State<BuyHomeScreen>{
        _listKey.currentState?.addNewCustomer(result);
         }
   }
+  Future<void> _profileScreen() async{
+    await Navigator.push(context, MaterialPageRoute(builder: (ctx)=> ProfileScreen(),),);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,16 +53,27 @@ class _HomeScreenDistState extends State<BuyHomeScreen>{
       );
     }
    return Scaffold(
-    floatingActionButton: FloatingActionButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (ctx)=> ProfileScreen(),),);}, ),
     appBar: AppBar(
-      backgroundColor: Colors.amber,
-      title: Text('Distribution'),
+      title: 
+      // Row(
+      //   children: [
+      //     SvgPicture.asset(
+      //   'assets/logos/milkdy_logo.svg', // Ensure this matches your path in lib/assets/logos
+      //   height: 35, // Adjust size to fit your AppBar
+      // ),
+      // const SizedBox(width: 12),
+     const  Text('Customers'),
+       // ],
+     // ),
       actions: [
+        IconButton(onPressed: _profileScreen, icon: Icon(Icons.person)),
         IconButton(
           onPressed: _newCardoverlay, 
           icon: Icon(Icons.add),
         ),
       ],
+        
+      
       
     ),
     body: Padding(
