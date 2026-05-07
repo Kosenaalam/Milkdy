@@ -12,6 +12,27 @@ class RangeDashboardDetailed extends StatelessWidget {
     required this.onDelete,
   });
 
+
+  Future<bool?> _showDeleteDialog(BuildContext context) {
+  return showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text("Delete Entry?"),
+      content: const Text("This will remove the entry and recalculate balances. This cannot be undone."),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: const Text("Cancel"),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          child: const Text("Delete", style: TextStyle(color: Colors.red)),
+        ),
+      ],
+    ),
+  );
+}
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -28,7 +49,6 @@ class RangeDashboardDetailed extends StatelessWidget {
                  vertical: 4.0,
                  ),
               child: Container(
-               //  decoration: BoxDecoration(shape: BoxShape.rectangle,borderRadius: BorderRadius.circular(8),),
                 color: Colors.grey.shade300,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                  
@@ -58,7 +78,7 @@ class RangeDashboardDetailed extends StatelessWidget {
               itemBuilder: (context, index) {
                 final item = entries[index];
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10,// vertical: 6
+                  padding: const EdgeInsets.symmetric(horizontal: 10,
                   ),
                   child: MilkCardItems(
                     item: item,
@@ -71,24 +91,7 @@ class RangeDashboardDetailed extends StatelessWidget {
                         return;
                       }
 
-                      final confirm = await showDialog<bool>(
-                        context: context,
-                        builder: (ctx) => AlertDialog(
-                          title: const Text("Delete Entry?"),
-                          content: const Text("This cannot be undone"),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(ctx, false),
-                              child: const Text("Cancel"),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(ctx, true),
-                              child: const Text("Delete", style: TextStyle(color: Colors.red)),
-                            ),
-                          ],
-                        ),
-                      );
-
+                      final confirm = await _showDeleteDialog(context);
                       if (confirm == true) {
                         onDelete(item.id);
                       }

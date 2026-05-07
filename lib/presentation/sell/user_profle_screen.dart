@@ -45,8 +45,6 @@ String _monthName(int month) {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 20),
-
-            // Profile Avatar
             CircleAvatar(
               radius: 50,
               backgroundColor: Colors.blue.shade100,
@@ -60,12 +58,6 @@ String _monthName(int month) {
               user!.email ?? "No Email",
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-
-            // const SizedBox(height: 8),
-            // Text(
-            //   "User ID: ${user.id}",
-            //   style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-            // ),
 
             const SizedBox(height: 30),
 
@@ -111,7 +103,6 @@ String _monthName(int month) {
                 icon: const Icon(Icons.logout),
                 label: const Text("Logout"),
                 style: ElevatedButton.styleFrom(
-                 // backgroundColor: Colors.red,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
               ),

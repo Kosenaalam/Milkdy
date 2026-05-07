@@ -11,9 +11,7 @@ class SellCardList extends StatefulWidget{
 }
 
 class SellCardListState extends State<SellCardList> {
- //----final CustomerRepo _repo = CustomerRepo();
  final _searchControllar = TextEditingController();
- //=====
    List<CustumerModel> _customers = [];
    List<CustumerModel> _filterCustomers = [];
    bool _isLoading = true;
@@ -24,7 +22,6 @@ class SellCardListState extends State<SellCardList> {
     super.initState();
     _loadCustomers();
     _searchControllar.addListener(_filterdCustomers);
-    debugPrint('initState called');
   }
   @override
   void dispose() {
@@ -56,11 +53,10 @@ class SellCardListState extends State<SellCardList> {
 
    void addNewCustomer(CustumerModel newCustomer) {
     setState(() {
-       _customers.insert(0, newCustomer);       // ✅ important
+       _customers.insert(0, newCustomer);       
       _filterCustomers.insert(0, newCustomer);
     });
    }
- //=====
 
   void _filterdCustomers(){
     final Query = _searchControllar.text.trim().toLowerCase();
@@ -78,37 +74,24 @@ class SellCardListState extends State<SellCardList> {
 
   Future<void> removeCustomer(String customerId) async {
   try {
-    // 1. Delete from Supabase (this is the missing part!)
     await CustomerRepo().deleteCustomer(customerId);
 
-    // 2. Remove locally (instant UI update)
     setState(() {
       _customers.removeWhere((c) => c.id == customerId);
       _filterCustomers.removeWhere((c) => c.id == customerId);
     });
 
-    // 3. Show success message with Undo option
     final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar();
     messenger.showSnackBar(
       SnackBar(
         content: const Text('Customer deleted successfully'),
         duration: Duration(seconds: 2),
-        // action: SnackBarAction(
-        //   label: 'Undo',
-        //   onPressed: () {
-        //     // Undo: re-fetch full list from server (simple & safe)
-        //     _loadCustomers(showLoading: false);
-        //     ScaffoldMessenger.of(context).showSnackBar(
-        //       const SnackBar(content: Text('Undo successful'),duration: Duration(seconds: 2),),
-        //     );
-        //   },
-        // ),
       ),
     );
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Failed to delete: $e')),
+      SnackBar(content: Text('Failed to delete. Something went wrong')),
     );
   }
 }
@@ -129,7 +112,7 @@ class SellCardListState extends State<SellCardList> {
               const Icon(Icons.error_outline, color: Colors.red, size: 48),
               const SizedBox(height: 16),
               Text(
-                'Error loading customers:\n$_errorMessage',
+                'Error loading customers',//:\n$_errorMessage',
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: Colors.red),
               ),
@@ -143,8 +126,6 @@ class SellCardListState extends State<SellCardList> {
         ),
       );
     }
-    
-  
      if(_customers.isEmpty){
   return Center(
     child: Text(
@@ -154,9 +135,6 @@ class SellCardListState extends State<SellCardList> {
 }
         return Column(
           children: [
-              //  Padding(
-              //    padding: const EdgeInsets.all(16),
-              //    ),
                 TextField(
                   controller: _searchControllar,
                   decoration: InputDecoration(
@@ -175,11 +153,8 @@ class SellCardListState extends State<SellCardList> {
                     ),
                   ),
                 ),
-        //   ],
-        // );
-        
+       
   const SizedBox(height: 10,),
-     // final customers = _customers;
        Expanded(
          child:   _filterCustomers.isEmpty
            ?  Center(
@@ -193,7 +168,6 @@ class SellCardListState extends State<SellCardList> {
             itemCount: _filterCustomers.length,
             itemBuilder: (context, index){
               final  custumer= _filterCustomers[index];
-              debugPrint(custumer.name);
               return SellCardItems(customer: custumer,
             onDelete: () async {
             final confirm = await showDialog<bool>(
@@ -202,7 +176,8 @@ class SellCardListState extends State<SellCardList> {
             title: const Text('Delete Customer?'),
            content: const Text('This action cannot be undone.'),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+        TextButton(onPressed: () => Navigator.pop(ctx, false), 
+        child: const Text('Cancel')),
         TextButton(
           onPressed: () => Navigator.pop(ctx, true),
           child: const Text('Delete', style: TextStyle(color: Colors.red)),

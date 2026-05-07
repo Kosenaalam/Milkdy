@@ -29,7 +29,7 @@ class MilkCardItems extends StatelessWidget{
                           Text("₹${item.amount}"),
                           Text("₹${item.recived}"),
                           Text("₹${item.paid}"),
-                          Text("${item.feed}"),
+                          Text("${item.feed}".toString()),
                           Text(
                                "₹${item.balance}",
                                 style: const TextStyle(fontWeight: FontWeight.bold),

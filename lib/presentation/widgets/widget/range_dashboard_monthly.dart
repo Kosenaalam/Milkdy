@@ -13,19 +13,19 @@ class RangeDashboardMonthly extends StatelessWidget {
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           child: ListTile(
-            title: Text(item.month),
+            title: Text(item.month,style: TextStyle(fontWeight: FontWeight.bold),),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Milk: ${item.liters}L"),
-                Text("Fat: ${item.avgFat.toStringAsFixed(1)}"),
+                Text("Milk: ${item.liters}L",style: TextStyle(fontWeight: FontWeight.bold),),
+                Text("Fat: ${item.avgFat.toStringAsFixed(1)}",style: TextStyle(fontWeight: FontWeight.bold),),
               ],
             ),
             trailing: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text("Rec: ₹${item.recived}"),
-                Text("Paid: ₹${item.tPaid}"),
+                Text("Rec: ₹${item.recived}",style: TextStyle(fontWeight: FontWeight.bold),),
+                Text("Paid: ₹${item.tPaid}",style: TextStyle(fontWeight: FontWeight.bold),),
                 Text("Milk Amount: ₹${item.amount}", style: TextStyle(fontWeight: FontWeight.bold),),
               ],
             ),

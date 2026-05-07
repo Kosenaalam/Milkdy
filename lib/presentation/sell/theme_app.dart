@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
 
-  /// 🎨 LIGHT COLORS (same as your example)
+  ///  LIGHT COLORS 
   static final ColorScheme lightColorScheme = ColorScheme.fromSeed(
     seedColor: const Color.fromARGB(255, 243, 176, 219),
   );

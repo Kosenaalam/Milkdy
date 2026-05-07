@@ -1,116 +1,30 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:milkdy/data/models/add_milk_entry_model.dart';
-import 'package:milkdy/data/models/each_milk_entry_model.dart';
-import 'package:milkdy/data/models/monthly_model.dart';
-import 'package:milkdy/data/models/sell_model.dart';
-import 'package:milkdy/data/repositories/milk_entry_repo.dart';
-import 'package:milkdy/presentation/widgets/generete_monthly_pdf.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:milkdy/presentation/widgets/range_dashboard_buttons.dart';
 import 'package:milkdy/presentation/widgets/widget/range_dashboard_detailed.dart';
 import 'package:milkdy/presentation/widgets/widget/range_dashboard_monthly.dart';
-import 'package:milkdy/presentation/widgets/widget/range_dashboard_summary.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:milkdy/provider/milk_entry_repo_provider.dart';
 import 'package:milkdy/presentation/widgets/pdf_total.dart';
-import 'package:month_year_picker/month_year_picker.dart';
 
 
-class RangeDashboardScreen extends StatefulWidget {
+class RangeDashboardScreen extends ConsumerStatefulWidget {
   final String customerId;
   final String? customerName;
 
   const RangeDashboardScreen({super.key, required this.customerId, this.customerName});
 
   @override
-  State<RangeDashboardScreen> createState() => _RangeDashboardScreenState();
+  ConsumerState<RangeDashboardScreen> createState() => _RangeDashboardScreenState();
 }
 
-class _RangeDashboardScreenState extends State<RangeDashboardScreen> {
+class _RangeDashboardScreenState extends ConsumerState<RangeDashboardScreen> {
   DateTime selectedMonth = DateTime.now();
-  final repo = MilkRepo();
-   //final now = DateTime.now();
-  //int nowYear = DateTime.now().year;
   int selectedDays = 1;
   int months = 0;
-  bool isLoading = true;
   bool _showdetails = false;
-  bool isOffline = false;
 
-//  List<RangeDashboardModel> data = [];
-  List<EachMilkEntryModel> entries = [];
-  List<MonthlyModel> monthlyData = [];
 
-  @override
-  void initState() {
-    super.initState();
-    _loadCachedData();
-    loadData();
-  }
 
-  // ==================== ALL YOUR ORIGINAL METHODS (100% UNCHANGED) ====================
-
-  Future<void> _loadCachedData() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final String? cachedSummary = prefs.getString('summary_${widget.customerId}');
-      final String? cachedEntries = prefs.getString('entries_${widget.customerId}');
-
-      if (cachedSummary != null) {
-        final List<dynamic> decoded = jsonDecode(cachedSummary);
-       // data = decoded.map((e) => RangeDashboardModel.fromMap(e)).toList();
-      }
-      if (cachedEntries != null) {
-        final List<dynamic> decoded = jsonDecode(cachedEntries);
-        entries = decoded.map((e) => EachMilkEntryModel.fromMap(e)).toList();
-      }
-      setState(() {});
-    } catch (e) {
-      print("CACHE ERROR: $e");
-    }
-  }
-
-  Future<void> _saveToCache() async {
-    final prefs = await SharedPreferences.getInstance();
-   // final summaryJson = jsonEncode(data.map((e) => e.toMap()).toList());
-    final entriesJson = jsonEncode(entries.map((e) => e.toMap()).toList());
-
-   // await prefs.setString('summary_${widget.customerId}', summaryJson);
-    await prefs.setString('entries_${widget.customerId}', entriesJson);
-  }
-
-  Future<void> loadData() async {
-    setState(() => isLoading = true);
-    try {
-     // final summary = await repo.getRangeDashboard(widget.customerId, selectedDays);
-      final entryData = await repo.getEntries(widget.customerId, selectedDays);
-      final mData = await repo.getMonthlyCollection(widget.customerId, months );
-
-      setState(() {
-       // data = summary;
-        entries = entryData;
-        monthlyData = mData;
-        isLoading = false;
-        isOffline = false;
-      });
-      await _saveToCache();
-    } catch (e) {
-      setState(() => isOffline = true);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Offline Mode - Showing cached data")),
-      );
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
-
-  void deleteEntry(String id) async {
-    await repo.deletedata(id);
-    await repo.recalculateBalance(id);
-    setState(() {
-      entries.removeWhere((c) => c.id == id);
-    });
-    await loadData();
-  }
 
   Future<void> pickMonth() async {
      final date = DateTime.now();
@@ -123,7 +37,6 @@ class _RangeDashboardScreenState extends State<RangeDashboardScreen> {
     );
     if (picked != null) {
       setState(() => selectedMonth = picked);
-      loadMonthlyData();
     }
   }
 
@@ -133,37 +46,24 @@ class _RangeDashboardScreenState extends State<RangeDashboardScreen> {
     return "${months[date.month - 1]} ${date.year}";
   }
 
-  Future<void> loadMonthlyData() async {
-    try {
-      final res = await repo.getMonthEntries(
-        widget.customerId,
-        selectedMonth.month,
-        selectedMonth.year,
-      );
-      setState(() => entries = res);
-    } catch (e) {
-      print("MONTH LOAD ERROR: $e");
-    }
-  }
-   Future<void> reportpdf()async{
-    final entries = await repo.getMonthEntries(
-      widget.customerId,
-      selectedMonth.month,
-      selectedMonth.year,
-    );
-
-    await generateFullReportPdf(
-      entries: entries,
-       month: getMonthName(selectedMonth),
-       customerName: widget.customerName ?? "Customer",
-       );
-   }
-
+  
+  
 
 @override
 Widget build(BuildContext context) {
+  final entriesAsync = ref.watch(
+    getEntriesProvider(
+      (customerId: widget.customerId, days: selectedDays),
+      ),);
+      final monthlyAsync = ref.watch(getMonthlyCollectionProvider(
+        (customerId: widget.customerId, months: months)
+      ),);
+      final getPdfAsync = ref.watch(getpdfDataProvider(
+        (customerId: widget.customerId, month: selectedMonth.month, year: selectedMonth.year)
+      ),);
+
   return Scaffold(
-    appBar: AppBar(title:  Text(widget.customerName ?? "Customer Dashboard"),
+    appBar: AppBar(title:  Text(widget.customerName?.toUpperCase() ?? "Customer Dashboard"),
     centerTitle: true,
     ),
     body: SafeArea(
@@ -187,10 +87,21 @@ Widget build(BuildContext context) {
         icon: const Icon(Icons.calendar_month),
         label: const Text("Change"),
       ),
-       ElevatedButton.icon(
-        onPressed: reportpdf,
-       icon: const Icon(Icons.download),
-       label: Text("PDF"),
+      ElevatedButton.icon(
+      onPressed: getPdfAsync.maybeWhen(
+    data: (pdfEntries) => () => generateFullReportPdf(
+      entries: pdfEntries,
+      month: getMonthName(selectedMonth),
+      customerName: widget.customerName ?? "Customer",
+    ),
+    orElse: () => () {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Data still loading, please wait...")),
+      );
+    },
+  ),
+  icon: const Icon(Icons.download),
+  label: const Text("PDF"),
 ),
     ],
   ),
@@ -199,56 +110,69 @@ Widget build(BuildContext context) {
             selectedDays: selectedDays,
             onChanged: (days) {
               setState(() => selectedDays = days);
-              loadData();
             },
           ),
         
 
           const SizedBox(height: 8),
 
-          if (isLoading)
-            const Expanded(child: Center(child: CircularProgressIndicator()))
-          else if (
-            //data.isEmpty && 
-          entries.isEmpty)
-            const Expanded(child: Center(child: Text("No Data Found")))
-          else
-            Expanded(
-              child: ListView(
-                children: [
-                  RangeDashboardMonthly(monthlyData: monthlyData),
-                  const Divider(),
-              //    RangeDashboardSummary(data: data),
-                //  const Divider(),
+          Expanded(
+              child: entriesAsync.when(  
+                data: (entries) => entries.isEmpty
+                    ? const Center(child: Text("No Data Found"))   
+                    : ListView(                                
+                        children: [
+                          RangeDashboardMonthly(
+                            monthlyData: monthlyAsync.valueOrNull ?? [],
+                          ),
+                          const Divider(),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Center(
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  setState(() {
+                                    _showdetails = !_showdetails;
+                                  });
+                                },
+                                icon: Icon(
+                                  _showdetails ? Icons.visibility_off : Icons.visibility,
+                                ),
+                                label: Text(
+                                  _showdetails ? 'Hide Detailed Entries' : 'Show Detailed Entries',
+                                ),
+                              ),
+                            ),
+                          ),
 
-                  // Toggle Button
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Center(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            _showdetails = !_showdetails;
-                          });
-                        },
-                        icon: Icon(
-                          _showdetails ? Icons.visibility_off : Icons.visibility,
-                        ),
-                        label: Text(
-                          _showdetails ? 'Hide Detailed Entries' : 'Show Detailed Entries',
-                        ),
+                          // Detailed Entries
+                          if (_showdetails)
+                            RangeDashboardDetailed(
+                              entries: entries,
+                              onDelete: (id) async {
+                                try {
+                                  await ref.read(milkEntryRepoProvider).deletedata(id);
+                                  ref.invalidate(milkEntryRepoProvider);
+                                  ref.invalidate(getMonthlyCollectionProvider);
+                                  ref.invalidate(getpdfDataProvider);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Entry deleted successfully!')),
+                                  );
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Failed to delete entry. something went wrong')),
+                                  );
+                                }
+                              },
+                            ),
+                        ],
                       ),
-                    ),
-                  ),
+                loading: () => const Center(child: CircularProgressIndicator()),
 
-                  // Detailed Entries - Now properly shown
-                  if (_showdetails)
-                    RangeDashboardDetailed(
-                      entries: entries,
-                      onDelete: deleteEntry,
-                    ),
-                ],
-              ),
+                error: (error, stackTrace) => const Center(
+                  child: Text("Error loading data"),
+                ),
+              ),  
             ),
         ],
       ),

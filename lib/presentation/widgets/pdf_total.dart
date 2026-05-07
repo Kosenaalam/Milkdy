@@ -3,7 +3,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:share_plus/share_plus.dart'; // 👈 Add this import
+import 'package:share_plus/share_plus.dart'; 
 
 Future<void> generateFullReportPdf({
   required List entries,
@@ -12,7 +12,6 @@ Future<void> generateFullReportPdf({
 }) async {
   final pdf = pw.Document();
 
-  /// 🔢 TOTAL CALCULATION
   double totalMilk = 0.0;
   double totalAmount = 0;
   double totalReceived = 0;
@@ -38,7 +37,7 @@ Future<void> generateFullReportPdf({
     lastBalance = entries.last.balance;
   }
 
-  /// 🟣 COVER PAGE
+  // Cover page
   pdf.addPage(
     pw.Page(
       build: (context) => pw.Center(
@@ -76,13 +75,13 @@ Future<void> generateFullReportPdf({
     ),
   );
  
-  /// 🟢 REPORT PAGE
+  // REPORT PAGE
   pdf.addPage(
     pw.MultiPage(
       pageFormat: PdfPageFormat.a4,
       build: (context) => [
 
-        /// HEADER
+        // HEADER
         pw.Row(
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
           children: [
@@ -94,7 +93,7 @@ Future<void> generateFullReportPdf({
         ),
 
         pw.SizedBox(height: 10),
-        pw.Text("Customer: $customerName"),
+        pw.Text("Customer: $customerName".toUpperCase()),
         pw.Divider(),
 
         pw.SizedBox(height: 10),
@@ -169,27 +168,23 @@ Future<void> generateFullReportPdf({
     ),
   );
 
-  /// 📤 PREVIEW / SHARE
+  // SHARE
   await Printing.layoutPdf(
     onLayout: (format) async => pdf.save(),
   );
-/// 📤 1. SAVE THE FILE (Only do this once!)
+/// save
   final directory = await getApplicationDocumentsDirectory();
   final filePath = "${directory.path}/Milkdy_$month.pdf";
   final file = File(filePath);
   
-  // Save the PDF bytes into the file we just defined
+  // Save the PDF bytes 
   await file.writeAsBytes(await pdf.save());
 
-  /// 📲 2. SHARE TO WHATSAPP
-  // We point the Share tool to the 'filePath' we created above
+  // SHARE TO WHATSAPP
   await Share.shareXFiles(
     [XFile(filePath)],
     text: 'Milk Report for $customerName - $month',
   );
-
-
-  //=====
 }
 pw.Widget _cell(String text, {bool bold = false}) {
   return pw.Padding(

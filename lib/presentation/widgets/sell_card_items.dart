@@ -29,8 +29,6 @@ class _SellCardItemsState extends State<SellCardItems> {
          child: NewMilkEntryCard(customerId: widget.customer.id,),
          ),
     );
-    // NewMilkEntryCard(customerId:  widget.customer.id,),
-    // );
    }
    void _openDashboard(){
       Navigator.push(context,
@@ -38,7 +36,7 @@ class _SellCardItemsState extends State<SellCardItems> {
       builder: (ctx) =>
        RangeDashboardScreen(customerId: widget.customer.id,
         customerName: widget.customer.name,
-        ),
+         ),
         ),
       );
    }
@@ -59,7 +57,7 @@ Widget build(BuildContext context) {
           onPressed: widget.onDelete,
         ),
         title: Text(
-          widget.customer.name,
+          widget.customer.name.toUpperCase(),
           style: Theme.of(context).textTheme.titleMedium,
         ),
         subtitle: Text(
