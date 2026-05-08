@@ -72,7 +72,7 @@ class _NewCardState extends State<NewCard>{
           children: [
             TextField(
              controller: _textControllar,
-              maxLength: 20,
+              maxLength: 15,
               decoration: InputDecoration(
                 label: Text('Name'),
               ),
@@ -81,7 +81,7 @@ class _NewCardState extends State<NewCard>{
              TextField(
              controller: _phoneControllar,
              keyboardType: TextInputType.phone,
-              maxLength: 20,
+              maxLength: 10,
               decoration: InputDecoration(
                 label: Text('Phone'),
               ),

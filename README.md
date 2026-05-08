@@ -16,12 +16,10 @@
    
    <div align="center">
 
-<img src="screenshots/01-login.png" width="280" alt="Login">
-<img src="screenshots/02-dashboard.png" width="280" alt="Dashboard">
-<img src="screenshots/03-milk-entry.png" width="280" alt="Milk Entry">
-<img src="screenshots/04-customer-list.png" width="280" alt="Customer List">
-<img src="screenshots/05-range-dashboard.png" width="280" alt="Range Dashboard">
-<img src="screenshots/06-pdf-report.png" width="280" alt="PDF Report">
+<img src="screenshots/profiile.jpg" width="280" alt="Login">
+<img src="screenshots/dashboard.jpg" width="280" alt="Dashboard">
+<img src="screenshots/homescreen.jpg" width="280" alt="Milk Entry">
+<img src="screenshots/pdf.jpg" width="280" alt="Customer List">
 
 </div>
 
