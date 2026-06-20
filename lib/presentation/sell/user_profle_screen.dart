@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:milkdy/data/repositories/auth_repo.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -11,34 +12,41 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final user = Supabase.instance.client.auth.currentUser;
   String _formatDate(String? isoString) {
-  if (isoString == null) return "Unknown";
-  try {
-    final date = DateTime.parse(isoString);
-    return "${date.day} ${_monthName(date.month)} ${date.year}";
-  } catch (e) {
-    return isoString.split('T')[0];
+    if (isoString == null) return "Unknown";
+    try {
+      final date = DateTime.parse(isoString);
+      return "${date.day} ${_monthName(date.month)} ${date.year}";
+    } catch (e) {
+      return isoString.split('T')[0];
+    }
   }
-}
 
-String _monthName(int month) {
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return months[month - 1];
-}
+  String _monthName(int month) {
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    return months[month - 1];
+  }
 
   @override
   Widget build(BuildContext context) {
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text("No user logged in")),
-      );
+      return const Scaffold(body: Center(child: Text("No user logged in")));
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("My Profile"),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text("My Profile"), centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -64,7 +72,9 @@ String _monthName(int month) {
             // Account Details Card
             Card(
               elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -72,17 +82,18 @@ String _monthName(int month) {
                   children: [
                     const Text(
                       "Account Information",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 16),
 
                     _infoRow("Email", user!.email ?? "Not Available"),
-                 //   _infoRow("Phone", user.phone ?? "Not Added"),
-                 //   _infoRow("User ID", user.id),
-                    _infoRow("Created At", _formatDate(user!.createdAt),
-                    ),
-                    _infoRow("Last Sign In", _formatDate(user!.lastSignInAt),
-                    ),
+                    //   _infoRow("Phone", user.phone ?? "Not Added"),
+                    //   _infoRow("User ID", user.id),
+                    _infoRow("Created At", _formatDate(user!.createdAt)),
+                    _infoRow("Last Sign In", _formatDate(user!.lastSignInAt)),
                   ],
                 ),
               ),
@@ -96,8 +107,16 @@ String _monthName(int month) {
               child: ElevatedButton.icon(
                 onPressed: () async {
                   await Supabase.instance.client.auth.signOut();
+                  if (!context.mounted) return;
                   if (mounted) {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginUser(),
+                      ),
+                    );
+
+                    // Navigator.of(context).popUntil((route) => route.isFirst);
                   }
                 },
                 icon: const Icon(Icons.logout),
@@ -121,14 +140,12 @@ String _monthName(int month) {
         children: [
           SizedBox(
             width: 100,
-            child: Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
-          ),
-          Expanded(
             child: Text(
-              value,
-              style: const TextStyle(fontSize: 15),
+              label,
+              style: const TextStyle(fontWeight: FontWeight.w500),
             ),
           ),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 15))),
         ],
       ),
     );

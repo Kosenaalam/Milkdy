@@ -134,7 +134,8 @@ Future<void> generateFullReportPdf({
                   _cell("${e.balance}"),
                 ],
               );
-            }).toList(),
+            }),
+           // .toList(),
 
             /// TOTAL
             pw.TableRow(

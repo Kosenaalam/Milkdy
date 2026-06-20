@@ -6,15 +6,19 @@ import 'package:milkdy/presentation/widgets/widget/range_dashboard_monthly.dart'
 import 'package:milkdy/provider/milk_entry_repo_provider.dart';
 import 'package:milkdy/presentation/widgets/pdf_total.dart';
 
-
 class RangeDashboardScreen extends ConsumerStatefulWidget {
   final String customerId;
   final String? customerName;
 
-  const RangeDashboardScreen({super.key, required this.customerId, this.customerName});
+  const RangeDashboardScreen({
+    super.key,
+    required this.customerId,
+    this.customerName,
+  });
 
   @override
-  ConsumerState<RangeDashboardScreen> createState() => _RangeDashboardScreenState();
+  ConsumerState<RangeDashboardScreen> createState() =>
+      _RangeDashboardScreenState();
 }
 
 class _RangeDashboardScreenState extends ConsumerState<RangeDashboardScreen> {
@@ -23,11 +27,8 @@ class _RangeDashboardScreenState extends ConsumerState<RangeDashboardScreen> {
   int months = 0;
   bool _showdetails = false;
 
-
-
-
   Future<void> pickMonth() async {
-     final date = DateTime.now();
+    final date = DateTime.now();
     final firstDate = DateTime(date.year, date.month - 2);
     final picked = await showDatePicker(
       context: context,
@@ -41,91 +42,111 @@ class _RangeDashboardScreenState extends ConsumerState<RangeDashboardScreen> {
   }
 
   String getMonthName(DateTime date) {
-    const months = ["January", "February", "March", "April", "May", "June",
-                    "July", "August", "September", "October", "November", "December"];
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
     return "${months[date.month - 1]} ${date.year}";
   }
 
-  
-  
+  @override
+  Widget build(BuildContext context) {
+    final entriesAsync = ref.watch(
+      getEntriesProvider((customerId: widget.customerId, days: selectedDays)),
+    );
+    final monthlyAsync = ref.watch(
+      getMonthlyCollectionProvider((
+        customerId: widget.customerId,
+        months: months,
+      )),
+    );
+    final getPdfAsync = ref.watch(
+      getpdfDataProvider((
+        customerId: widget.customerId,
+        month: selectedMonth.month,
+        year: selectedMonth.year,
+      )),
+    );
 
-@override
-Widget build(BuildContext context) {
-  final entriesAsync = ref.watch(
-    getEntriesProvider(
-      (customerId: widget.customerId, days: selectedDays),
-      ),);
-      final monthlyAsync = ref.watch(getMonthlyCollectionProvider(
-        (customerId: widget.customerId, months: months)
-      ),);
-      final getPdfAsync = ref.watch(getpdfDataProvider(
-        (customerId: widget.customerId, month: selectedMonth.month, year: selectedMonth.year)
-      ),);
-
-  return Scaffold(
-    appBar: AppBar(title:  Text(widget.customerName?.toUpperCase() ?? "Customer Dashboard"),
-    centerTitle: true,
-    ),
-    body: SafeArea(
-      child: Column(
-        children: [
-          Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-  child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Text(
-        getMonthName(selectedMonth),
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-      ),  
-
-      ElevatedButton.icon(
-        onPressed: pickMonth,
-        icon: const Icon(Icons.calendar_month),
-        label: const Text("Change"),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.customerName?.toUpperCase() ?? "Customer Dashboard"),
+        centerTitle: true,
       ),
-      ElevatedButton.icon(
-      onPressed: getPdfAsync.maybeWhen(
-    data: (pdfEntries) => () => generateFullReportPdf(
-      entries: pdfEntries,
-      month: getMonthName(selectedMonth),
-      customerName: widget.customerName ?? "Customer",
-    ),
-    orElse: () => () {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Data still loading, please wait...")),
-      );
-    },
-  ),
-  icon: const Icon(Icons.download),
-  label: const Text("PDF"),
-),
-    ],
-  ),
-),
-          RangeDashboardButtons(
-            selectedDays: selectedDays,
-            onChanged: (days) {
-              setState(() => selectedDays = days);
-            },
-          ),
-        
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    getMonthName(selectedMonth),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
 
-          const SizedBox(height: 8),
+                  ElevatedButton.icon(
+                    onPressed: pickMonth,
+                    icon: const Icon(Icons.calendar_month),
+                    label: const Text("Change"),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: getPdfAsync.maybeWhen(
+                      data: (pdfEntries) =>
+                          () => generateFullReportPdf(
+                            entries: pdfEntries,
+                            month: getMonthName(selectedMonth),
+                            customerName: widget.customerName ?? "Customer",
+                          ),
+                      orElse: () => () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Data still loading, please wait..."),
+                          ),
+                        );
+                      },
+                    ),
+                    icon: const Icon(Icons.download),
+                    label: const Text("PDF"),
+                  ),
+                ],
+              ),
+            ),
+            RangeDashboardButtons(
+              selectedDays: selectedDays,
+              onChanged: (days) {
+                setState(() => selectedDays = days);
+              },
+            ),
 
-          Expanded(
-              child: entriesAsync.when(  
+            const SizedBox(height: 8),
+
+            Expanded(
+              child: entriesAsync.when(
                 data: (entries) => entries.isEmpty
-                    ? const Center(child: Text("No Data Found"))   
-                    : ListView(                                
+                    ? const Center(child: Text("No Data Found"))
+                    : ListView(
                         children: [
                           RangeDashboardMonthly(
                             monthlyData: monthlyAsync.valueOrNull ?? [],
                           ),
+
                           const Divider(),
+
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             child: Center(
@@ -136,10 +157,14 @@ Widget build(BuildContext context) {
                                   });
                                 },
                                 icon: Icon(
-                                  _showdetails ? Icons.visibility_off : Icons.visibility,
+                                  _showdetails
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
                                 ),
                                 label: Text(
-                                  _showdetails ? 'Hide Detailed Entries' : 'Show Detailed Entries',
+                                  _showdetails
+                                      ? 'Hide Detailed Entries'
+                                      : 'Show Detailed Entries',
                                 ),
                               ),
                             ),
@@ -151,16 +176,27 @@ Widget build(BuildContext context) {
                               entries: entries,
                               onDelete: (id) async {
                                 try {
-                                  await ref.read(milkEntryRepoProvider).deletedata(id);
+                                  await ref
+                                      .read(milkEntryRepoProvider)
+                                      .deletedata(id);
+                                  if (!context.mounted) return;
                                   ref.invalidate(milkEntryRepoProvider);
                                   ref.invalidate(getMonthlyCollectionProvider);
                                   ref.invalidate(getpdfDataProvider);
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Entry deleted successfully!')),
+                                    const SnackBar(
+                                      content: Text(
+                                        'Entry deleted successfully!',
+                                      ),
+                                    ),
                                   );
                                 } catch (e) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Failed to delete entry. something went wrong')),
+                                    SnackBar(
+                                      content: Text(
+                                        'Failed to delete entry. something went wrong',
+                                      ),
+                                    ),
                                   );
                                 }
                               },
@@ -169,14 +205,13 @@ Widget build(BuildContext context) {
                       ),
                 loading: () => const Center(child: CircularProgressIndicator()),
 
-                error: (error, stackTrace) => const Center(
-                  child: Text("Error loading data"),
-                ),
-              ),  
+                error: (error, stackTrace) =>
+                    const Center(child: Text("Error loading data")),
+              ),
             ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

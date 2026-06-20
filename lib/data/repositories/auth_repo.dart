@@ -74,13 +74,13 @@ class _LoginUserState extends State<LoginUser> {
         _userEmail = rawEmail;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('OTP sent to your email')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('OTP sent to your email')));
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _errorMessage = 'Failed to send OTP. Try again  ${e}.';
+        _errorMessage = 'Failed to send OTP. Try again  $e.';
       });
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -119,9 +119,9 @@ class _LoginUserState extends State<LoginUser> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login successful')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Login successful')));
 
       setState(() {
         _isOtpSent = false;
@@ -200,10 +200,7 @@ class _LoginUserState extends State<LoginUser> {
             ],
             if (_errorMessage != null) ...[
               const SizedBox(height: 12),
-              Text(
-                _errorMessage!,
-                style: const TextStyle(color: Colors.red),
-              ),
+              Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
             ],
           ],
         ),
